@@ -1,5 +1,6 @@
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
 import { login, getUserInfo, getUserDetailById } from '@/api/user'
+
 export default {
   namespaced: true,
   state: {
@@ -32,6 +33,8 @@ export default {
     async login(context, data) {
       const result = await login(data) // 实际上就是一个promise  result就是执行的结果
       context.commit('setToken', result)
+      // 写入时间戳
+      setTimeStamp() // 将当前的最新时间写入缓存
     },
     // 获取用户资料action
     async getUserInfo(context) {

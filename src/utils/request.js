@@ -2,6 +2,9 @@
 import axios from 'axios'
 import { Message } from "element-ui"
 import store from '@/store'
+import router from '@/router'
+import { getTimeStamp } from '@/utils/auth'
+const TimeOut = 3600 // 定义超时时间
 
 // 创建一个axios的实例
 const service = axios.create({
@@ -14,8 +17,15 @@ service.interceptors.request.use(config => {
   // 在这个位置需要统一的去注入token
   if (store.getters.token) {
     // 如果token存在 注入token
+    if (IsCheckTimeOut()) {
+      // 如果它为true表示 过期了
+      // token没用了 因为超时了
+      store.dispatch('user/logout') // 登出操作
+      // 跳转到登录页
+      router.push('/login')
+      return Promise.reject(new Error('token超时了'))
+    }
     config.headers['Authorization'] = `Bearer ${store.getters.token}`
-    console.log(config)
   }
   return config // 必须返回配置
 }, error => {
@@ -36,4 +46,12 @@ service.interceptors.response.use(responce => {
   Message.error(error.message)
   return Promise.reject(error)
 })
+
+// 是否超时
+// 超时逻辑  (当前时间  - 缓存中的时间) 是否大于 时间差
+function IsCheckTimeOut() {
+  var currentTime = Date.now() // 当前时间戳
+  var timeStamp = getTimeStamp() // 缓存时间戳
+  return (currentTime - timeStamp) / 1000 > TimeOut
+}
 export default service // 导出axios实例
