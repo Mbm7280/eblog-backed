@@ -14,6 +14,7 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import * as directives from '@/directives'
 
 /**
  * If you don't want to use mock-server
@@ -29,10 +30,17 @@ import '@/permission' // permission control
 //   mockXHR()
 // }
 
+// 注册自定义指令
+Object.keys(directives).forEach(key => {
+  Vue.directive(key, directives[key])
+})
+
 // set ElementUI lang to EN
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
+
+
 
 Vue.config.productionTip = false
 
