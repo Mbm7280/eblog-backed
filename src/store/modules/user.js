@@ -1,5 +1,5 @@
 import { getToken, setToken, removeToken, setTimeStamp } from '@/utils/auth'
-import { login, getUserInfo, getUserDetailById } from '@/api/user'
+import { login, getUserInfo } from '@/api/user'
 
 export default {
   namespaced: true,
@@ -32,16 +32,14 @@ export default {
     // 定义login action  也需要参数 调用action时 传递过来的参数
     async login(context, data) {
       const result = await login(data) // 实际上就是一个promise  result就是执行的结果
-      context.commit('setToken', result)
+      context.commit('setToken', result.token)
       // 写入时间戳
       setTimeStamp() // 将当前的最新时间写入缓存
     },
     // 获取用户资料action
     async getUserInfo(context) {
       const result = await getUserInfo() // 获取返回值
-      const baseInfo = await getUserDetailById(result.userId) // 为了获取头像
-      const baseResult = { ...result, ...baseInfo } // 将两个接口结果合并
-      context.commit('setUserInfo', baseResult) // 将整个的个人信息设置到用户的vuex数据中
+      context.commit('setUserInfo', result) // 将整个的个人信息设置到用户的vuex数据中
       return result // 这里为什么要返回 为后面埋下伏笔
     },
     // 登出的action

@@ -34,9 +34,8 @@ service.interceptors.request.use(config => {
 
 // 响应拦截器
 service.interceptors.response.use(responce => {
-  console.log(responce)
-  const { success, message, data } = responce.data
-  if (success) {
+  const { code, message, data } = responce.data
+  if (code === 200) {
     return data
   } else {
     Message.error(message)

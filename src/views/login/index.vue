@@ -8,15 +8,15 @@
         </h3>
       </div>
 
-      <el-form-item prop="mobile">
+      <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
           ref="username"
-          v-model="loginForm.mobile"
+          v-model="loginForm.username"
           placeholder="Username"
-          name="mobile"
+          name="username"
           type="text"
           tabindex="1"
           auto-complete="on"
@@ -46,8 +46,8 @@
       <el-button class="loginBtn" :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
       <div class="tips">
-        <span style="margin-right:20px;">账号: 13800000002</span>
-        <span> 密码: 123456</span>
+        <span style="margin-right:20px;">账号: t1</span>
+        <span> 密码: admin</span>
       </div>
 
     </el-form>
@@ -76,8 +76,8 @@ export default {
     }
     return {
       loginForm: {
-        mobile: '13800000002',
-        password: '888itcast.CN764%...'
+        username: 't1',
+        password: 'admin'
       },
       loginRules: {
         // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -109,7 +109,6 @@ export default {
     },
     handleLogin() {
       this.$refs.loginForm.validate(async isOK => {
-        console.log(isOK)
         if (isOK) {
           try {
             this.loading = true
