@@ -1,36 +1,20 @@
 import Vue from 'vue'
+import App from './App'
+import store from './store'
+import router from './router'
 
 import 'normalize.css/normalize.css' // A modern alternative to CSS resets
 import * as filters from '@/filters' // 引入工具类
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import locale from 'element-ui/lib/locale/lang/en' // lang i18n
-
 import '@/styles/index.scss' // global css
-
-import App from './App'
-import store from './store'
-import router from './router'
-
 import '@/icons' // icon
 import '@/permission' // permission control
 import * as directives from '@/directives'
 import Components from '@/components'
-
-/**
- * If you don't want to use mock-server
- * you want to use MockJs for mock api
- * you can execute: mockXHR()
- *
- * Currently MockJs will be used in the production environment,
- * please remove it before going online ! ! !
- */
-// 有真实接口做为支撑
-// if (process.env.NODE_ENV === 'production') {
-//   const { mockXHR } = require('../mock')
-//   mockXHR()
-// }
-Vue.use(Components)
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 
 // 注册自定义指令
 Object.keys(directives).forEach(key => {
@@ -42,13 +26,13 @@ Object.keys(filters).forEach(key => {
   // 注册过滤器
   Vue.filter(key, filters[key])
 })
+Vue.config.productionTip = false
 
-// set ElementUI lang to EN
+Vue.use(Components)
+Vue.use(mavonEditor)
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
-
-Vue.config.productionTip = false
 
 new Vue({
   el: '#app',

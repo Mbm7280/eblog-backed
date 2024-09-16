@@ -15,3 +15,14 @@ export function getAllCategoryList() {
     method: 'GET'
   })
 }
+
+export function getAllCategoryListByCateName(categoryName) {
+  // 返回一个axios对象 => promise  // 返回了一个promise对象
+  return request({
+    url: '/busCategory/getAllCategoryListByCateName',
+    method: 'GET',
+    params: {
+      categoryName: categoryName
+    }
+  })
+}

@@ -1,29 +1,5 @@
 <template>
   <el-card class="main-card">
-    <div class="title">{{ this.$route.name }}</div>
-    <div class="operation-container">
-      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>
-      <el-button
-        type="danger"
-        size="small"
-        icon="el-icon-delete"
-        :disabled="linkIdList.length == 0"
-        @click="deleteFlag = true">
-        批量删除
-      </el-button>
-      <div style="margin-left: auto">
-        <el-input
-          v-model="keywords"
-          prefix-icon="el-icon-search"
-          size="small"
-          placeholder="请输入友链名"
-          style="width: 200px"
-          @keyup.enter.native="searchLinks" />
-        <el-button type="primary" size="small" icon="el-icon-search" style="margin-left: 1rem" @click="searchLinks">
-          搜索
-        </el-button>
-      </div>
-    </div>
     <el-table border :data="linkList" @selection-change="selectionChange" v-loading="loading">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="linkAvatar" label="链接头像" align="center" width="180">

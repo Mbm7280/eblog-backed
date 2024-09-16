@@ -21,3 +21,22 @@ export function delArticle(articleID) {
     method: 'DELETE'
   })
 }
+
+export function addOrEditArticle(data) {
+  return request({
+    url: `/busArticle/addOrEditArticle`,
+    method: 'POST',
+    data
+  })
+}
+
+export function getArticleByArticleID(articleID) {
+  return request({
+    url: `/busArticle/getArticleByArticleID`,
+    method: 'GET',
+    params: {
+      articleID: articleID
+    }
+  })
+}
+

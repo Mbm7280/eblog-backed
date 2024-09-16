@@ -1,22 +1,23 @@
 <template>
   <!-- 放置表格和分页 -->
   <el-card>
+    <el-button @click="goToWrite">写文章</el-button>
     <el-table border :data="articleList">
-      <el-table-column label="序号" type="index" />
-      <el-table-column label="标题" prop="articleTitle" />
-      <el-table-column label="分类" prop="categoryId" :formatter="formatArticleCategory" />
-      <el-table-column label="缩略图" prop="articleCover" />
-      <el-table-column label="文章摘要" prop="articleAbstract" />
-      <el-table-column label="文章类型" prop="articleType" />
-      <el-table-column label="文章状态" prop="articleStatus" :formatter="formatArticleStatus" />
-      <el-table-column label="创作时间" prop="createTime" >
+      <el-table-column label="序号" type="index"/>
+      <el-table-column label="标题" prop="articleTitle"/>
+      <el-table-column label="分类" prop="categoryId" :formatter="formatArticleCategory"/>
+      <el-table-column label="缩略图" prop="articleCover"/>
+      <el-table-column label="文章摘要" prop="articleAbstract"/>
+      <el-table-column label="文章类型" prop="articleType" :formatter="formatArticleType" />
+      <el-table-column label="文章状态" prop="articleStatus" :formatter="formatArticleStatus"/>
+      <el-table-column label="创作时间" prop="createTime">
         <!-- 作用域插槽 -->
         <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
       </el-table-column>
       <el-table-column label="操作" sortable="" fixed="right" width="280">
         <template v-slot="{row}">
           <el-button type="text" size="small">查看</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="editArticle(row.id)">编辑</el-button>
           <el-button type="text" size="small" @click="delArticle(row.id)">删除</el-button>
         </template>
       </el-table-column>
@@ -36,15 +37,15 @@
 
 <script>
 import {delArticle, getAllArticleList} from '@/api/article'
-import { getCategoryByID,getAllCategoryList } from '@/api/category'
+import {getCategoryByID, getAllCategoryList} from '@/api/category'
 import ArticleEnum from '@/api/constant/article'
 
 export default {
   created() {
     this.getAllArticleList(),
-    this.getAllCategoryList()
+      this.getAllCategoryList()
   },
-  data: function () {
+  data: function() {
     return {
       loading: false,
       articleList: [],
@@ -56,10 +57,15 @@ export default {
       }
     }
   },
-  rules: {
-
-  },
+  rules: {},
   methods: {
+    editArticle(id) {
+      console.log(id)
+      this.$router.push(`/article/editArticle/${id}`)
+    },
+    goToWrite() {
+      this.$router.push('/article/addArticle')
+    },
     async delArticle(articleID) {
       try {
         await this.$confirm('您确定删除该文章吗？')
@@ -70,15 +76,15 @@ export default {
         console.log(error)
       }
     },
-    async  getAllArticleList() {
+    async getAllArticleList() {
       const result = await getAllArticleList()
       this.articleList = result
     },
-    async  getCategoryByID() {
+    async getCategoryByID() {
       const result = await getCategoryByID()
       this.categoryInfo = result
     },
-    async  getAllCategoryList() {
+    async getAllCategoryList() {
       const result = await getAllCategoryList()
       this.categoryList = result
     },
@@ -89,23 +95,16 @@ export default {
     },
     // 格式化文章分类
     formatArticleCategory(row, column, cellValue, index) {
-      console.log(111)
-      console.log(row)
-      console.log(column)
-      console.log(cellValue)
-      console.log(index)
-      console.log(222)
-      console.log(this.categoryList)
-      console.log(333)
       const articleCategory = this.categoryList.find(item => item.id === cellValue)
       return articleCategory ? articleCategory.categoryName : '未知'
     },
+    formatArticleType(row, column, cellValue, index) {
+      const articleType = ArticleEnum.articleTypeList.find(item => item.type === cellValue)
+      return articleType ? articleType.value : '未知'
+    }
   },
-  watch: {
-
-  },
-  computed: {
-  }
+  watch: {},
+  computed: {}
 }
 </script>
 
