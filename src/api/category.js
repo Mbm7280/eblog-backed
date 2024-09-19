@@ -26,3 +26,38 @@ export function getAllCategoryListByCateName(categoryName) {
     }
   })
 }
+
+export function getAllPageCategoryList(categoryName, pageNum, pageSize) {
+  return request({
+    url: '/busCategory/getAllPageCategoryList',
+    method: 'GET',
+    params: {
+      cateName: categoryName,
+      pageNum: pageNum,
+      pageSize: pageSize
+    }
+  })
+}
+
+export function addOrEditCategory(data) {
+  return request({
+    url: '/busCategory/addOrEditCategory',
+    method: 'POST',
+    data
+  })
+}
+
+export function deleteCategoryByCateID(cateID) {
+  return request({
+    url: `/busCategory/deleteCategoryByCateID/${cateID}`,
+    method: 'DELETE'
+  })
+}
+
+export function delCateBatchByCateID(data) {
+  return request({
+    url: `/busCategory/delCateBatchByCateID`,
+    method: 'DELETE',
+    data
+  })
+}

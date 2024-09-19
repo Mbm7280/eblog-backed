@@ -32,19 +32,15 @@
     <el-table border :data="categories" @selection-change="selectionChange" v-loading="loading">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="categoryName" label="分类名" align="center" />
-      <el-table-column prop="articleCount" label="文章量" align="center" />
+<!--      <el-table-column prop="articleCount" label="文章量" align="center" />-->
       <el-table-column prop="createTime" label="创建时间" align="center">
-        <template slot-scope="scope">
-          <i class="el-icon-time" style="margin-right: 5px" />
-          {{ scope.row.createTime | date }}
-        </template>
+        <!-- 作用域插槽 -->
+        <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
       </el-table-column>
       <el-table-column label="操作" width="160" align="center">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑 </el-button>
-          <el-popconfirm title="确定删除吗？" style="margin-left: 1rem" @confirm="deleteCategory(scope.row.id)">
-            <el-button size="mini" type="danger" slot="reference"> 删除 </el-button>
-          </el-popconfirm>
+          <el-button type="danger" size="mini" @click="deleteCategoryByCateID(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -63,7 +59,7 @@
       <div style="font-size: 1rem">是否删除选中项？</div>
       <div slot="footer">
         <el-button @click="isDelete = false">取 消</el-button>
-        <el-button type="primary" @click="deleteCategory(null)"> 确 定 </el-button>
+        <el-button type="primary" @click="deleteCategoryByCateID(null)"> 确 定 </el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="addOrEdit" width="30%">
@@ -82,10 +78,12 @@
 </template>
 
 <script>
+import { getAllPageCategoryList, addOrEditCategory, deleteCategoryByCateID, delCateBatchByCateID } from '@/api/category'
 export default {
   created() {
-    this.current = this.$store.state.pageState.category
-    this.listCategories()
+    // this.current = this.$store.state.pageState.category
+    // this.listCategories()
+    this.getAllPageCategoryList()
   },
   data: function () {
     return {
@@ -105,6 +103,44 @@ export default {
     }
   },
   methods: {
+    async getAllPageCategoryList() {
+      const result = await getAllPageCategoryList(this.keywords, this.current, this.size)
+      this.categories = result.list
+      this.count = result.total
+      this.loading = false
+    },
+    async addOrEditCategory() {
+      if (this.categoryForm.categoryName.trim() === '') {
+        this.$message.error('分类名不能为空')
+        return false
+      }
+      const result = await addOrEditCategory(this.categoryForm)
+      console.log(result)
+      this.addOrEdit = false
+      this.getAllPageCategoryList()
+      if (this.categoryForm.id) {
+        this.$message.success('修改成功')
+      } else {
+        this.$message.success('新增成功')
+      }
+    },
+    async deleteCategoryByCateID(cateID) {
+      console.log(888)
+      console.log(this.categoryIds)
+      try {
+        if (cateID) {
+          await this.$confirm('您确定删除该文章吗？')
+          await deleteCategoryByCateID(cateID)
+        } else {
+          await delCateBatchByCateID(this.categoryIds)
+        }
+        this.isDelete = false
+        this.getAllPageCategoryList()
+        this.$message.info('删除分类成功')
+      } catch (error) {
+        console.log(error)
+      }
+    },
     selectionChange(categories) {
       this.categoryIds = []
       categories.forEach((item) => {
@@ -112,17 +148,29 @@ export default {
       })
     },
     searchCategories() {
+      console.log(this.keywords)
       this.current = 1
-      this.listCategories()
+      this.getAllPageCategoryList()
     },
     sizeChange(size) {
       this.size = size
-      this.listCategories()
+      this.getAllPageCategoryList()
     },
     currentChange(current) {
       this.current = current
       this.$store.commit('updateCategoryPageState', current)
       this.listCategories()
+    },
+    openModel(category) {
+      if (category != null) {
+        this.categoryForm = JSON.parse(JSON.stringify(category))
+        this.$refs.categoryTitle.innerHTML = '修改分类'
+      } else {
+        this.categoryForm.id = null
+        this.categoryForm.categoryName = ''
+        this.$refs.categoryTitle.innerHTML = '添加分类'
+      }
+      this.addOrEdit = true
     },
     deleteCategory(id) {
       let param = {}
@@ -146,54 +194,45 @@ export default {
         }
         this.isDelete = false
       })
-    },
-    listCategories() {
-      this.axios
-        .get('/api/admin/categories', {
-          params: {
-            current: this.current,
-            size: this.size,
-            keywords: this.keywords
-          }
-        })
-        .then(({ data }) => {
-          this.categories = data.data.records
-          this.count = data.data.count
-          this.loading = false
-        })
-    },
-    openModel(category) {
-      if (category != null) {
-        this.categoryForm = JSON.parse(JSON.stringify(category))
-        this.$refs.categoryTitle.innerHTML = '修改分类'
-      } else {
-        this.categoryForm.id = null
-        this.categoryForm.categoryName = ''
-        this.$refs.categoryTitle.innerHTML = '添加分类'
-      }
-      this.addOrEdit = true
-    },
-    addOrEditCategory() {
-      if (this.categoryForm.categoryName.trim() == '') {
-        this.$message.error('分类名不能为空')
-        return false
-      }
-      this.axios.post('/api/admin/categories', this.categoryForm).then(({ data }) => {
-        if (data.flag) {
-          this.$notify.success({
-            title: '成功',
-            message: data.message
-          })
-          this.listCategories()
-        } else {
-          this.$notify.error({
-            title: '失败',
-            message: data.message
-          })
-        }
-        this.addOrEdit = false
-      })
     }
+    // listCategories() {
+    //   this.axios
+    //     .get('/api/admin/categories', {
+    //       params: {
+    //         current: this.current,
+    //         size: this.size,
+    //         keywords: this.keywords
+    //       }
+    //     })
+    //     .then(({ data }) => {
+    //       this.categories = data.data.records
+    //       this.count = data.data.count
+    //       this.loading = false
+    //     })
+    // },
+    // addOrEditCategory() {
+    //   console.log(123)
+    //   console.log(this.categoryForm)
+    //   if (this.categoryForm.categoryName.trim() === '') {
+    //     this.$message.error('分类名不能为空')
+    //     return false
+    //   }
+    //   this.axios.post('/api/admin/categories', this.categoryForm).then(({ data }) => {
+    //     if (data.flag) {
+    //       this.$notify.success({
+    //         title: '成功',
+    //         message: data.message
+    //       })
+    //       this.listCategories()
+    //     } else {
+    //       this.$notify.error({
+    //         title: '失败',
+    //         message: data.message
+    //       })
+    //     }
+    //     this.addOrEdit = false
+    //   })
+    // }
   }
 }
 </script>

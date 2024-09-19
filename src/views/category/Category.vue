@@ -1,34 +1,34 @@
 <template>
   <el-card class="main-card">
-    <div class="title">{{ this.$route.name }}</div>
-    <div class="operation-container">
-      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>
-      <el-button
-        type="danger"
-        size="small"
-        icon="el-icon-delete"
-        :disabled="this.categoryIds.length == 0"
-        @click="isDelete = true">
-        批量删除
-      </el-button>
-      <div style="margin-left: auto">
-        <el-input
-          v-model="keywords"
-          prefix-icon="el-icon-search"
-          size="small"
-          placeholder="请输入分类名"
-          style="width: 200px"
-          @keyup.enter.native="searchCategories" />
-        <el-button
-          type="primary"
-          size="small"
-          icon="el-icon-search"
-          style="margin-left: 1rem"
-          @click="searchCategories">
-          搜索
-        </el-button>
-      </div>
-    </div>
+    <div class="title">{{ this.$route.meta.title }}</div>
+<!--    <div class="operation-container">-->
+<!--      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>-->
+<!--      <el-button-->
+<!--        type="danger"-->
+<!--        size="small"-->
+<!--        icon="el-icon-delete"-->
+<!--        :disabled="this.categoryIds.length == 0"-->
+<!--        @click="isDelete = true">-->
+<!--        批量删除-->
+<!--      </el-button>-->
+<!--      <div style="margin-left: auto">-->
+<!--        <el-input-->
+<!--          v-model="keywords"-->
+<!--          prefix-icon="el-icon-search"-->
+<!--          size="small"-->
+<!--          placeholder="请输入分类名"-->
+<!--          style="width: 200px"-->
+<!--          @keyup.enter.native="searchCategories" />-->
+<!--        <el-button-->
+<!--          type="primary"-->
+<!--          size="small"-->
+<!--          icon="el-icon-search"-->
+<!--          style="margin-left: 1rem"-->
+<!--          @click="searchCategories">-->
+<!--          搜索-->
+<!--        </el-button>-->
+<!--      </div>-->
+<!--    </div>-->
     <el-table border :data="categories" @selection-change="selectionChange" v-loading="loading">
       <el-table-column type="selection" width="55" />
       <el-table-column prop="categoryName" label="分类名" align="center" />
