@@ -68,6 +68,7 @@
 </template>
 
 <script>
+
 export default {
   created() {
     this.current = this.$store.state.pageState.friendLink

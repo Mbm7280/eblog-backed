@@ -125,8 +125,6 @@ export default {
       }
     },
     async deleteCategoryByCateID(cateID) {
-      console.log(888)
-      console.log(this.categoryIds)
       try {
         if (cateID) {
           await this.$confirm('您确定删除该文章吗？')
