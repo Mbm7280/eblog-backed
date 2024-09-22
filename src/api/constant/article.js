@@ -3,7 +3,7 @@ export default {
   // 文章状态
   articleStatus: [
     {
-      status: '',
+      status: 'EXIST',
       value: '有效'
     },
     {

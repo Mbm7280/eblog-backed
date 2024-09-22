@@ -1,19 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import aboutRouter from './modules/about'
-import albumRouter from './modules/album'
 import articleRouter from './modules/article'
 import categoryRouter from './modules/category'
 import commentRouter from './modules/comment'
 import friendLinkRouter from './modules/friendLink'
-import logRouter from './modules/log'
-import menuRouter from './modules/menu'
 import resourceRouter from './modules/resource'
 import roleRouter from './modules/role'
-import settingRouter from './modules/setting'
-import tagRouter from './modules/tag'
-import talkRouter from './modules/talk'
-import websiteRouter from './modules/website'
 
 
 Vue.use(Router)
@@ -50,20 +42,12 @@ export const constantRoutes = [
 ]
 
 export const asyncRoutes = [
-  aboutRouter,
-  albumRouter,
   articleRouter,
   categoryRouter,
   commentRouter,
-  friendLinkRouter,
-  logRouter,
-  menuRouter,
   resourceRouter,
   roleRouter,
-  settingRouter,
-  tagRouter,
-  talkRouter,
-  websiteRouter
+  friendLinkRouter
 ]
 
 

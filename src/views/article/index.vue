@@ -1,8 +1,36 @@
 <template>
   <!-- 放置表格和分页 -->
   <el-card>
-    <el-button @click="goToWrite">写文章</el-button>
-    <el-table border :data="articleList">
+    <div class="operation-container">
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="goToWrite()"> 编写文章 </el-button>
+      <el-button
+        type="danger"
+        size="small"
+        icon="el-icon-delete"
+        :disabled="this.articleIdList.length == 0"
+        @click="deleteFlag = true">
+        批量删除
+      </el-button>
+      <div style="margin-left: auto">
+        <el-input
+          v-model="keywords"
+          prefix-icon="el-icon-search"
+          size="small"
+          placeholder="请输入文章名称"
+          style="width: 200px"
+          @keyup.enter.native="searchArticle" />
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-search"
+          style="margin-left: 1rem"
+          @click="searchArticle">
+          搜索
+        </el-button>
+      </div>
+    </div>
+    <el-table border :data="articleList"  @selection-change="selectionChange" >
+      <el-table-column type="selection" width="55" />
       <el-table-column label="序号" type="index"/>
       <el-table-column label="标题" prop="articleTitle"/>
       <el-table-column label="分类" prop="categoryId" :formatter="formatArticleCategory"/>
@@ -16,49 +44,82 @@
       </el-table-column>
       <el-table-column label="操作" sortable="" fixed="right" width="280">
         <template v-slot="{row}">
-          <el-button type="text" size="small">查看</el-button>
           <el-button type="text" size="small" @click="editArticle(row.id)">编辑</el-button>
           <el-button type="text" size="small" @click="delArticle(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <!-- 分页组件 -->
-    <el-row type="flex" justify="center" align="middle" style="height: 60px">
-      <el-pagination
-        layout="prev, pager, next"
-        :page-size="page.size"
-        :current-page="page.page"
-        :total="page.total"
-        @current-change="changePage"
-      />
-    </el-row>
+    <el-pagination
+      class="pagination-container"
+      background
+      @size-change="sizeChange"
+      @current-change="currentChange"
+      :current-page="current"
+      :page-size="size"
+      :total="count"
+      :page-sizes="[10, 20]"
+      layout="total, sizes, prev, pager, next, jumper" />
+    <el-dialog :visible.sync="deleteFlag" width="30%">
+      <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
+      <div style="font-size: 1rem">是否删除选中项？</div>
+      <div slot="footer">
+        <el-button @click="deleteFlag = false">取 消</el-button>
+        <el-button type="primary" @click="delArticle()"> 确 定 </el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
 <script>
-import {delArticle, getAllArticleList} from '@/api/article'
-import {getCategoryByID, getAllCategoryList} from '@/api/category'
+import { getAllPageArticleList, delArticle, delArticleBatch } from '@/api/article'
+import { getCategoryByID, getAllCategoryList } from '@/api/category'
 import ArticleEnum from '@/api/constant/article'
 
 export default {
   created() {
-    this.getAllArticleList(),
-      this.getAllCategoryList()
+    this.getAllPageArticleList()
+    this.getAllCategoryList()
   },
   data: function() {
     return {
+      keywords: null,
+      articleIdList: [],
+      deleteFlag: false,
       loading: false,
       articleList: [],
       categoryList: [],
-      page: {
-        page: 1, // 当前页码
-        size: 10,
-        total: 0 // 总数
-      }
+      current: 1,
+      size: 10,
+      count: 0
     }
   },
   rules: {},
   methods: {
+    currentChange(current) {
+      this.current = current
+      this.getAllPageArticleList()
+    },
+    sizeChange(size) {
+      this.size = size
+      this.getAllPageArticleList()
+    },
+    async getAllPageArticleList() {
+      const result = await getAllPageArticleList(this.keywords, this.current, this.size)
+      this.articleList = result.list
+      this.count = result.total
+      this.loading = false
+    },
+    selectionChange(articles) {
+      this.articleIdList = []
+      articles.forEach((item) => {
+        this.articleIdList.push(item.id)
+      })
+    },
+    searchArticle() {
+      this.current = 1
+      this.getAllPageArticleList()
+    },
     editArticle(id) {
       console.log(id)
       this.$router.push(`/article/editArticle/${id}`)
@@ -68,17 +129,18 @@ export default {
     },
     async delArticle(articleID) {
       try {
-        await this.$confirm('您确定删除该文章吗？')
-        await delArticle(articleID)
-        this.getAllArticleList()
+        if (articleID) {
+          await this.$confirm('您确定删除该文章吗？')
+          await delArticle(articleID)
+        } else {
+          await delArticleBatch(this.articleIdList)
+        }
+        this.deleteFlag = false
+        this.getAllPageArticleList()
         this.$message.info('删除文章成功')
       } catch (error) {
         console.log(error)
       }
-    },
-    async getAllArticleList() {
-      const result = await getAllArticleList()
-      this.articleList = result
     },
     async getCategoryByID() {
       const result = await getCategoryByID()

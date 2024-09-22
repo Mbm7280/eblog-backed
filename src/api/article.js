@@ -9,6 +9,17 @@ export function getAllArticleList(params) {
   })
 }
 
+export function getAllPageArticleList(articleTitle, pageNum, pageSize) {
+  return request({
+    url: '/busArticle/getAllPageArticleList',
+    method: 'GET',
+    params: {
+      articleTitle: articleTitle,
+      pageNum: pageNum,
+      pageSize: pageSize
+    }
+  })
+}
 
 /**
  * 删除文章
@@ -40,3 +51,10 @@ export function getArticleByArticleID(articleID) {
   })
 }
 
+export function delArticleBatch(data) {
+  return request({
+    url: `/busArticle/delArticleBatch`,
+    method: 'DELETE',
+    data
+  })
+}

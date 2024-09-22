@@ -66,7 +66,7 @@
       </el-dialog>
       <el-dialog :visible.sync="addOrEdit" width="30%">
         <div class="dialog-title-container" slot="title" ref="roleTitle" />
-        <el-form label-width="80px" size="medium" :model="resForm">
+        <el-form label-width="80px" size="medium" :model="roleForm">
           <el-form-item label="角色名称">
             <el-input style="width: 250px" v-model="roleForm.roleName" />
           </el-form-item>
