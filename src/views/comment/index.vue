@@ -1,97 +1,94 @@
 <template>
-  <div class="article-title-container">
+  <el-card class="main-card">
     <div class="title">{{ this.$route.meta.title }}</div>
-    <el-card class="main-card">
-      <div class="operation-container">
-        <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增角色 </el-button>
-        <el-button
-          type="danger"
+    <div class="operation-container">
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增评论</el-button>
+      <el-button
+        type="danger"
+        size="small"
+        icon="el-icon-delete"
+        :disabled="this.commentIdList.length === 0"
+        @click="deleteFlag = true">
+        批量删除
+      </el-button>
+      <div style="margin-left: auto">
+        <el-input
+          v-model="keywords"
+          prefix-icon="el-icon-search"
           size="small"
-          icon="el-icon-delete"
-          :disabled="this.commentIdList.length == 0"
-          @click="deleteFlag = true">
-          批量删除
+          placeholder="请输入评论内容"
+          style="width: 200px"
+          @keyup.enter.native="searchComment"/>
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-search"
+          style="margin-left: 1rem"
+          @click="searchComment">
+          搜索
         </el-button>
-        <div style="margin-left: auto">
-          <el-input
-            v-model="keywords"
-            prefix-icon="el-icon-search"
-            size="small"
-            placeholder="请输入评论词"
-            style="width: 200px"
-            @keyup.enter.native="searchComment" />
-          <el-button
-            type="primary"
-            size="small"
-            icon="el-icon-search"
-            style="margin-left: 1rem"
-            @click="searchComment">
-            搜索
-          </el-button>
-        </div>
       </div>
-      <el-table border :data="commentList" @selection-change="selectionChange" v-loading="loading">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="userId" label="评论用户Id" align="center" />
-        <el-table-column prop="acticleId" label="文章ID" align="center" />
-        <el-table-column prop="commentContent" label="评论内容" align="center" />
-        <el-table-column prop="replyUserId" label="回复用户ID" align="center" />
-        <el-table-column prop="parentId" label="父评论id" align="center" />
-        <el-table-column prop="createTime" label="创建时间" width="140" align="center">
-          <!-- 作用域插槽 -->
-          <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="160">
-          <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑 </el-button>
-            <el-button type="danger" size="mini" @click="delComment(scope.row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        class="pagination-container"
-        background
-        @size-change="sizeChange"
-        @current-change="currentChange"
-        :current-page="current"
-        :page-size="size"
-        :total="count"
-        :page-sizes="[10, 20]"
-        layout="total, sizes, prev, pager, next, jumper" />
-      <el-dialog :visible.sync="deleteFlag" width="30%">
-        <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
-        <div style="font-size: 1rem">是否删除选中项？</div>
-        <div slot="footer">
-          <el-button @click="deleteFlag = false">取 消</el-button>
-          <el-button type="primary" @click="delComment(null)"> 确 定 </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog :visible.sync="addOrEdit" width="30%">
-        <div class="dialog-title-container" slot="title" ref="commentTitle" />
-        <el-form label-width="80px" size="medium" :model="commentForm">
-          <el-form-item label="评论用户">
-            <el-input style="width: 250px" v-model="commentForm.userId" />
-          </el-form-item>
-          <el-form-item label="文章">
-            <el-input style="width: 250px" v-model="commentForm.acticleId" />
-          </el-form-item>
-          <el-form-item label="评论内容">
-            <el-input style="width: 250px" v-model="commentForm.commentContent" />
-          </el-form-item>
-          <el-form-item label="回复用户">
-            <el-input style="width: 250px" v-model="commentForm.replyUserId" />
-          </el-form-item>
-          <el-form-item label="父评论">
-            <el-input style="width: 250px" v-model="commentForm.parentId" />
-          </el-form-item>
-        </el-form>
-        <div slot="footer">
-          <el-button @click="closeDialog">取 消</el-button>
-          <el-button type="primary" @click="addOrEditComment"> 确 定 </el-button>
-        </div>
-      </el-dialog>
-    </el-card>
-  </div>
+    </div>
+    <el-table border :data="commentList" @selection-change="selectionChange" v-loading="loading">
+      <el-table-column type="selection" width="55"/>
+      <el-table-column prop="userId" label="评论用户Id" align="center"/>
+      <el-table-column prop="articleId" label="文章ID" align="center"/>
+      <el-table-column prop="commentContent" label="评论内容" align="center"/>
+      <el-table-column prop="replyUserId" label="回复用户ID" align="center"/>
+      <el-table-column prop="parentId" label="父评论id" align="center"/>
+      <el-table-column prop="createTime" label="创建时间" width="140" align="center">
+        <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="160">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑</el-button>
+          <el-button type="danger" size="mini" @click="delComment(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      class="pagination-container"
+      background
+      @size-change="sizeChange"
+      @current-change="currentChange"
+      :current-page="current"
+      :page-size="size"
+      :total="count"
+      :page-sizes="[10, 20]"
+      layout="total, sizes, prev, pager, next, jumper"/>
+    <el-dialog :visible.sync="deleteFlag" width="30%">
+      <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900"/>提示</div>
+      <div style="font-size: 1rem">是否删除选中项？</div>
+      <div slot="footer">
+        <el-button @click="deleteFlag = false">取 消</el-button>
+        <el-button type="primary" @click="delComment(null)"> 确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog :visible.sync="addOrEdit" width="30%">
+      <div class="dialog-title-container" slot="title" ref="commentTitle"/>
+      <el-form label-width="80px" size="medium" :model="commentForm">
+        <el-form-item label="评论用户">
+          <el-input style="width: 250px" v-model="commentForm.userId"/>
+        </el-form-item>
+        <el-form-item label="文章">
+          <el-input style="width: 250px" v-model="commentForm.articleId"/>
+        </el-form-item>
+        <el-form-item label="评论内容">
+          <el-input style="width: 250px" v-model="commentForm.commentContent"/>
+        </el-form-item>
+        <el-form-item label="回复用户">
+          <el-input style="width: 250px" v-model="commentForm.replyUserId"/>
+        </el-form-item>
+        <el-form-item label="父评论">
+          <el-input style="width: 250px" v-model="commentForm.parentId"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="closeDialog">取 消</el-button>
+        <el-button type="primary" @click="addOrEditComment"> 确 定</el-button>
+      </div>
+    </el-dialog>
+  </el-card>
 </template>
 
 <script>
@@ -103,20 +100,19 @@ export default {
   },
   data: function() {
     return {
-      loading: true,
-      deleteFlag: false,
       keywords: null,
-      comments: [],
+      commentList: [],
+      commentIdList: [],
       commentForm: {
         id: null,
         userId: '',
-        acticleId: '',
+        articleId: '',
         commentContent: '',
         replyUserId: '',
         parentId: ''
       },
-      commentList: [],
-      commentIdList: [],
+      loading: true,
+      deleteFlag: false,
       addOrEdit: false,
       current: 1,
       size: 10,
@@ -129,7 +125,7 @@ export default {
         this.$message.error('用户ID不能为空')
         return false
       }
-      if (this.commentForm.acticleId.trim() === '') {
+      if (this.commentForm.articleId.trim() === '') {
         this.$message.error('文章ID不能为空')
         return false
       }

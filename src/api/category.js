@@ -47,16 +47,16 @@ export function addOrEditCategory(data) {
   })
 }
 
-export function deleteCategoryByCateID(cateID) {
+export function delCategory(cateID) {
   return request({
-    url: `/busCategory/deleteCategoryByCateID/${cateID}`,
+    url: `/busCategory/delCategory/${cateID}`,
     method: 'DELETE'
   })
 }
 
-export function delCateBatchByCateID(data) {
+export function delCategoryBatch(data) {
   return request({
-    url: `/busCategory/delCateBatchByCateID`,
+    url: `/busCategory/delCategoryBatch`,
     method: 'DELETE',
     data
   })

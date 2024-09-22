@@ -1,112 +1,111 @@
 <template>
-  <div class="article-title-container">
+  <el-card class="main-card">
     <div class="title">{{ this.$route.meta.title }}</div>
-    <el-card class="main-card">
-      <div class="operation-container">
-        <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>
-        <el-button
-          type="danger"
+    <div class="operation-container">
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增</el-button>
+      <el-button
+        type="danger"
+        size="small"
+        icon="el-icon-delete"
+        :disabled="this.friLinkIdList.length === 0"
+        @click="deleteFlag = true"
+      >
+        批量删除
+      </el-button>
+      <div style="margin-left: auto">
+        <el-input
+          v-model="keywords"
+          prefix-icon="el-icon-search"
           size="small"
-          icon="el-icon-delete"
-          :disabled="this.friLinkIdList.length == 0"
-          @click="deleteFlag = true">
-          批量删除
+          placeholder="请输入友链名称"
+          style="width: 200px"
+          @keyup.enter.native="searchFriLink"
+        />
+        <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-search"
+          style="margin-left: 1rem"
+          @click="searchFriLink"
+        >
+          搜索
         </el-button>
-        <div style="margin-left: auto">
-          <el-input
-            v-model="keywords"
-            prefix-icon="el-icon-search"
-            size="small"
-            placeholder="请输入友链名"
-            style="width: 200px"
-            @keyup.enter.native="searchFriLink" />
-          <el-button
-            type="primary"
-            size="small"
-            icon="el-icon-search"
-            style="margin-left: 1rem"
-            @click="searchFriLink">
-            搜索
-          </el-button>
-        </div>
       </div>
+    </div>
 
-      <el-table border :data="linkList" @selection-change="selectionChange" v-loading="loading">
-        <el-table-column type="selection" width="55" />
-        <el-table-column prop="friLinkAvatar" label="链接头像" align="center" width="180">
-          <template slot-scope="scope">
-            <img :src="scope.row.linkAvatar" width="40" height="40" />
-          </template>
-        </el-table-column>
-        <el-table-column prop="firLinkName" label="链接名" align="center" />
-        <el-table-column prop="friLinkAddress" label="链接地址" align="center" />
-        <el-table-column prop="friLinkIntro" label="链接介绍" align="center" />
-        <el-table-column prop="createTime" label="创建时间" width="140" align="center">
-          <!-- 作用域插槽 -->
-          <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
-        </el-table-column>
-        <el-table-column label="操作" align="center" width="160">
-          <template slot-scope="scope">
-            <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑 </el-button>
-            <el-button type="danger" size="mini" @click="deleteFriLink(scope.row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        class="pagination-container"
-        background
-        @size-change="sizeChange"
-        @current-change="currentChange"
-        :current-page="current"
-        :page-size="size"
-        :total="count"
-        :page-sizes="[10, 20]"
-        layout="total, sizes, prev, pager, next, jumper" />
-      <el-dialog :visible.sync="deleteFlag" width="30%">
-        <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
-        <div style="font-size: 1rem">是否删除选中项？</div>
-        <div slot="footer">
-          <el-button @click="deleteFlag = false">取 消</el-button>
-          <el-button type="primary" @click="deleteFriLink(null)"> 确 定 </el-button>
-        </div>
-      </el-dialog>
-      <el-dialog :visible.sync="addOrEdit" width="30%">
-        <div class="dialog-title-container" slot="title" ref="linkTitle" />
-        <el-form label-width="80px" size="medium" :model="linkForm">
-          <el-form-item label="链接名">
-            <el-input style="width: 250px" v-model="linkForm.firLinkName" />
-          </el-form-item>
-          <el-form-item label="链接头像">
-            <el-input style="width: 250px" v-model="linkForm.friLinkAvatar" />
-          </el-form-item>
-          <el-form-item label="链接地址">
-            <el-input style="width: 250px" v-model="linkForm.friLinkAddress" />
-          </el-form-item>
-          <el-form-item label="链接介绍">
-            <el-input style="width: 250px" v-model="linkForm.friLinkIntro" />
-          </el-form-item>
-        </el-form>
-        <div slot="footer">
-          <el-button @click="closeDialog">取 消</el-button>
-          <el-button type="primary" @click="addOrEditFriLink"> 确 定 </el-button>
-        </div>
-      </el-dialog>
-    </el-card>
-  </div>
+    <el-table v-loading="loading" border :data="linkList" @selection-change="selectionChange">
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="friLinkAvatar" label="链接头像" align="center" width="180">
+        <template slot-scope="scope">
+          <img :src="scope.row.linkAvatar" width="40" height="40" alt="友链头像">
+        </template>
+      </el-table-column>
+      <el-table-column prop="firLinkName" label="链接名" align="center" />
+      <el-table-column prop="friLinkAddress" label="链接地址" align="center" />
+      <el-table-column prop="friLinkIntro" label="链接介绍" align="center" />
+      <el-table-column prop="createTime" label="创建时间" width="140" align="center">
+        <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" width="160">
+        <template slot-scope="scope">
+          <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑</el-button>
+          <el-button type="danger" size="mini" @click="deleteFriLink(scope.row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      class="pagination-container"
+      background
+      :current-page="current"
+      :page-size="size"
+      :total="count"
+      :page-sizes="[10, 20]"
+      layout="total, sizes, prev, pager, next, jumper"
+      @size-change="sizeChange"
+      @current-change="currentChange"
+    />
+    <el-dialog :visible.sync="deleteFlag" width="30%">
+      <div slot="title" class="dialog-title-container"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
+      <div style="font-size: 1rem">是否删除选中项？</div>
+      <div slot="footer">
+        <el-button @click="deleteFlag = false">取 消</el-button>
+        <el-button type="primary" @click="deleteFriLink(null)"> 确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog :visible.sync="addOrEdit" width="30%">
+      <div slot="title" ref="linkTitle" class="dialog-title-container" />
+      <el-form label-width="80px" size="medium" :model="linkForm">
+        <el-form-item label="链接名">
+          <el-input v-model="linkForm.firLinkName" style="width: 250px" />
+        </el-form-item>
+        <el-form-item label="链接头像">
+          <el-input v-model="linkForm.friLinkAvatar" style="width: 250px" />
+        </el-form-item>
+        <el-form-item label="链接地址">
+          <el-input v-model="linkForm.friLinkAddress" style="width: 250px" />
+        </el-form-item>
+        <el-form-item label="链接介绍">
+          <el-input v-model="linkForm.friLinkIntro" style="width: 250px" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer">
+        <el-button @click="closeDialog">取 消</el-button>
+        <el-button type="primary" @click="addOrEditFriLink"> 确 定</el-button>
+      </div>
+    </el-dialog>
+  </el-card>
 </template>
 
 <script>
-import { getAllPageFriLinkList, addOrEditFriLink, delFriLinkByID, delFriLinkBatchByIDS } from '@/api/friendlink'
+import { getAllPageFriLinkList, addOrEditFriLink, delFriLink, delFriLinkBatch } from '@/api/friendlink'
 
 export default {
-  created() {
-    this.getAllPageFriLinkList()
-  },
   data: function() {
     return {
       keywords: null,
       friLinkIdList: [],
       friLinks: [],
+      linkList: [],
       linkForm: {
         id: null,
         firLinkName: '',
@@ -114,7 +113,6 @@ export default {
         friLinkIntro: '',
         friLinkAddress: ''
       },
-      linkList: [],
       loading: true,
       deleteFlag: false,
       addOrEdit: false,
@@ -122,6 +120,9 @@ export default {
       size: 10,
       count: 0
     }
+  },
+  created() {
+    this.getAllPageFriLinkList()
   },
   methods: {
     async addOrEditFriLink() {
@@ -161,9 +162,9 @@ export default {
       try {
         if (friLinkID) {
           await this.$confirm('您确定删除该文章吗？')
-          await delFriLinkByID(friLinkID)
+          await delFriLink(friLinkID)
         } else {
-          await delFriLinkBatchByIDS(this.friLinkIdList)
+          await delFriLinkBatch(this.friLinkIdList)
         }
         this.deleteFlag = false
         this.getAllPageFriLinkList()

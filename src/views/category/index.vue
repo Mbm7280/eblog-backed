@@ -2,12 +2,12 @@
   <el-card class="main-card">
     <div class="title">{{ this.$route.meta.title }}</div>
     <div class="operation-container">
-      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增</el-button>
       <el-button
         type="danger"
         size="small"
         icon="el-icon-delete"
-        :disabled="this.categoryIds.length == 0"
+        :disabled="this.categoryIds.length === 0"
         @click="isDelete = true">
         批量删除
       </el-button>
@@ -16,9 +16,9 @@
           v-model="keywords"
           prefix-icon="el-icon-search"
           size="small"
-          placeholder="请输入分类名"
+          placeholder="请输入分类名称"
           style="width: 200px"
-          @keyup.enter.native="searchCategories" />
+          @keyup.enter.native="searchCategories"/>
         <el-button
           type="primary"
           size="small"
@@ -30,17 +30,17 @@
       </div>
     </div>
     <el-table border :data="categories" @selection-change="selectionChange" v-loading="loading">
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="categoryName" label="分类名" align="center" />
-<!--      <el-table-column prop="articleCount" label="文章量" align="center" />-->
+      <el-table-column type="selection" width="55"/>
+      <el-table-column prop="categoryName" label="分类名" align="center"/>
+      <!-- TODO  文章量   -->
+      <!--      <el-table-column prop="articleCount" label="文章量" align="center" />-->
       <el-table-column prop="createTime" label="创建时间" align="center">
-        <!-- 作用域插槽 -->
         <template slot-scope="{ row }">{{ row.createTime | formatDate }}</template>
       </el-table-column>
       <el-table-column label="操作" width="160" align="center">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑 </el-button>
-          <el-button type="danger" size="mini" @click="deleteCategoryByCateID(scope.row.id)">删除</el-button>
+          <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑</el-button>
+          <el-button type="danger" size="mini" @click="delCategory(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,50 +53,49 @@
       :page-size="size"
       :total="count"
       :page-sizes="[10, 20]"
-      layout="total, sizes, prev, pager, next, jumper" />
+      layout="total, sizes, prev, pager, next, jumper"/>
     <el-dialog :visible.sync="isDelete" width="30%">
-      <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
+      <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900"/>提示</div>
       <div style="font-size: 1rem">是否删除选中项？</div>
       <div slot="footer">
         <el-button @click="isDelete = false">取 消</el-button>
-        <el-button type="primary" @click="deleteCategoryByCateID(null)"> 确 定 </el-button>
+        <el-button type="primary" @click="delCategory(null)"> 确 定</el-button>
       </div>
     </el-dialog>
     <el-dialog :visible.sync="addOrEdit" width="30%">
-      <div class="dialog-title-container" slot="title" ref="categoryTitle" />
+      <div class="dialog-title-container" slot="title" ref="categoryTitle"/>
       <el-form label-width="80px" size="medium" :model="categoryForm">
         <el-form-item label="分类名">
-          <el-input v-model="categoryForm.categoryName" style="width: 220px" />
+          <el-input v-model="categoryForm.categoryName" style="width: 220px"/>
         </el-form-item>
       </el-form>
       <div slot="footer">
         <el-button @click="addOrEdit = false">取 消</el-button>
-        <el-button type="primary" @click="addOrEditCategory"> 确 定 </el-button>
+        <el-button type="primary" @click="addOrEditCategory"> 确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
 </template>
 
 <script>
-import { getAllPageCategoryList, addOrEditCategory, deleteCategoryByCateID, delCateBatchByCateID } from '@/api/category'
+import { getAllPageCategoryList, addOrEditCategory, delCategory, delCategoryBatch } from '@/api/category'
+
 export default {
   created() {
-    // this.current = this.$store.state.pageState.category
-    // this.listCategories()
     this.getAllPageCategoryList()
   },
   data: function () {
     return {
-      isDelete: false,
-      loading: true,
-      addOrEdit: false,
-      keywords: null,
       categoryIds: [],
       categories: [],
       categoryForm: {
         id: null,
         categoryName: ''
       },
+      keywords: null,
+      isDelete: false,
+      loading: true,
+      addOrEdit: false,
       current: 1,
       size: 10,
       count: 0
@@ -124,13 +123,13 @@ export default {
         this.$message.success('新增成功')
       }
     },
-    async deleteCategoryByCateID(cateID) {
+    async delCategory(cateID) {
       try {
         if (cateID) {
           await this.$confirm('您确定删除该文章吗？')
-          await deleteCategoryByCateID(cateID)
+          await delCategory(cateID)
         } else {
-          await delCateBatchByCateID(this.categoryIds)
+          await delCategoryBatch(this.categoryIds)
         }
         this.isDelete = false
         this.getAllPageCategoryList()
@@ -169,68 +168,7 @@ export default {
         this.$refs.categoryTitle.innerHTML = '添加分类'
       }
       this.addOrEdit = true
-    },
-    deleteCategory(id) {
-      let param = {}
-      if (id == null) {
-        param = { data: this.categoryIds }
-      } else {
-        param = { data: [id] }
-      }
-      this.axios.delete('/api/admin/categories', param).then(({ data }) => {
-        if (data.flag) {
-          this.$notify.success({
-            title: '成功',
-            message: data.message
-          })
-          this.listCategories()
-        } else {
-          this.$notify.error({
-            title: '失败',
-            message: data.message
-          })
-        }
-        this.isDelete = false
-      })
     }
-    // listCategories() {
-    //   this.axios
-    //     .get('/api/admin/categories', {
-    //       params: {
-    //         current: this.current,
-    //         size: this.size,
-    //         keywords: this.keywords
-    //       }
-    //     })
-    //     .then(({ data }) => {
-    //       this.categories = data.data.records
-    //       this.count = data.data.count
-    //       this.loading = false
-    //     })
-    // },
-    // addOrEditCategory() {
-    //   console.log(123)
-    //   console.log(this.categoryForm)
-    //   if (this.categoryForm.categoryName.trim() === '') {
-    //     this.$message.error('分类名不能为空')
-    //     return false
-    //   }
-    //   this.axios.post('/api/admin/categories', this.categoryForm).then(({ data }) => {
-    //     if (data.flag) {
-    //       this.$notify.success({
-    //         title: '成功',
-    //         message: data.message
-    //       })
-    //       this.listCategories()
-    //     } else {
-    //       this.$notify.error({
-    //         title: '失败',
-    //         message: data.message
-    //       })
-    //     }
-    //     this.addOrEdit = false
-    //   })
-    // }
   }
 }
 </script>
