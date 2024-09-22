@@ -21,16 +21,16 @@ export function addOrEditFriLink(data) {
 }
 
 
-export function delFriLinkByID(friLinkID) {
+export function delFriLink(friLinkID) {
   return request({
-    url: `/busFriendLink/delFriLinkByID/${friLinkID}`,
+    url: `/busFriendLink/delFriLink/${friLinkID}`,
     method: 'DELETE'
   })
 }
 
-export function delFriLinkBatchByIDS(data) {
+export function delFriLinkBatch(data) {
   return request({
-    url: `/busFriendLink/delFriLinkBatchByIDS`,
+    url: `/busFriendLink/delFriLinkBatch`,
     method: 'DELETE',
     data
   })
