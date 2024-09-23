@@ -15,6 +15,15 @@ import * as directives from '@/directives'
 import Components from '@/components'
 import mavonEditor from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
+import ECharts from 'vue-echarts'
+import 'echarts/lib/chart/line'
+import 'echarts/lib/chart/pie'
+import 'echarts/lib/chart/bar'
+import 'echarts/lib/chart/map'
+import 'echarts/lib/component/tooltip'
+import 'echarts/lib/component/legend'
+import 'echarts/lib/component/title'
+
 
 // 注册自定义指令
 Object.keys(directives).forEach(key => {
@@ -31,6 +40,7 @@ Vue.config.productionTip = false
 Vue.use(Components)
 Vue.use(mavonEditor)
 Vue.use(ElementUI, { locale })
+Vue.component('v-chart', ECharts)
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
 
