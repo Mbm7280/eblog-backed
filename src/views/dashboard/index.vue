@@ -48,6 +48,7 @@
     </el-row>
 
     <el-row :gutter="20" style="margin-top: 1.25rem">
+<!--  TODO 文章浏览量统计    -->
 <!--      <el-col :span="16">-->
 <!--        <el-card>-->
 <!--          <div class="e-title">文章浏览量排行</div>-->
@@ -65,6 +66,12 @@
         </el-card>
       </el-col>
     </el-row>
+    <el-card style="margin-top: 1.25rem">
+      <div class="e-title">文章贡献统计</div>
+      <div v-loading="loading">
+        <calendar-heatmap :end-date="new Date()" :values="articleStatisticsList" />
+      </div>
+    </el-card>
   </div>
 </template>
 
@@ -73,8 +80,6 @@ import { getHomepageInfo } from '@/api/homepage'
 
 export default {
   created() {
-    // this.listUserArea()
-    // this.getData()
     this.getHomepageInfo()
   },
   data: function() {
@@ -85,6 +90,7 @@ export default {
       commentCount: 0,
       userCount: 0,
       articleCount: 0,
+      articleStatisticsList: [],
       ariticleRank: {
         tooltip: {
           trigger: 'axis',
@@ -140,6 +146,7 @@ export default {
       this.userCount = result.userCount
       this.articleCount = result.articleCount
       this.commentCount = result.commentCount
+      this.articleStatisticsList = result.articleStatisticsList
       if (result.articleCountResDTOList) {
         result.articleCountResDTOList.forEach(item => {
           this.category.series[0].data.push({
@@ -150,45 +157,6 @@ export default {
         })
       }
       this.loading = false
-
-      //     if (data.data.categoryDTOs != null) {
-      //       data.data.categoryDTOs.forEach((item) => {
-      //         this.category.series[0].data.push({
-      //           value: item.articleCount,
-      //           name: item.categoryName
-      //         })
-    }
-    // getData() {
-    //   this.axios.get('/api/admin').then(({ data }) => {
-    //     this.viewsCount = data.data.viewsCount
-    //     this.messageCount = data.data.messageCount
-    //     this.userCount = data.data.userCount
-    //     this.articleCount = data.data.articleCount
-    //
-    //     if (data.data.categoryDTOs != null) {
-    //       data.data.categoryDTOs.forEach((item) => {
-    //         this.category.series[0].data.push({
-    //           value: item.articleCount,
-    //           name: item.categoryName
-    //         })
-    //         this.category.legend.data.push(item.categoryName)
-    //       })
-    //     }
-    //
-    //     if (data.data.articleRankDTOs != null) {
-    //       data.data.articleRankDTOs.forEach((item) => {
-    //         this.ariticleRank.series[0].data.push(item.viewsCount)
-    //         this.ariticleRank.xAxis.data.push(item.articleTitle)
-    //       })
-    //     }
-    //
-    //     this.loading = false
-    //   })
-    // }
-  },
-  watch: {
-    type() {
-      this.listUserArea()
     }
   }
 }

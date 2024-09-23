@@ -23,6 +23,7 @@ import 'echarts/lib/chart/map'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/legend'
 import 'echarts/lib/component/title'
+import VueCalendarHeatmap from 'vue-calendar-heatmap'
 
 
 // 注册自定义指令
@@ -40,6 +41,7 @@ Vue.config.productionTip = false
 Vue.use(Components)
 Vue.use(mavonEditor)
 Vue.use(ElementUI, { locale })
+Vue.use(VueCalendarHeatmap)
 Vue.component('v-chart', ECharts)
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
