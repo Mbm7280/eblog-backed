@@ -48,15 +48,14 @@
     </el-row>
 
     <el-row :gutter="20" style="margin-top: 1.25rem">
-<!--  TODO 文章浏览量统计    -->
-<!--      <el-col :span="16">-->
-<!--        <el-card>-->
-<!--          <div class="e-title">文章浏览量排行</div>-->
-<!--          <div style="height: 350px">-->
-<!--            <v-chart :options="ariticleRank" v-loading="loading" />-->
-<!--          </div>-->
-<!--        </el-card>-->
-<!--      </el-col>-->
+      <el-col :span="16">
+        <el-card>
+          <div class="e-title">文章浏览量排行</div>
+          <div style="height: 350px">
+            <v-chart :options="articleView" v-loading="loading" />
+          </div>
+        </el-card>
+      </el-col>
       <el-col :span="8">
         <el-card>
           <div class="e-title">文章分类统计</div>
@@ -91,7 +90,7 @@ export default {
       userCount: 0,
       articleCount: 0,
       articleStatisticsList: [],
-      ariticleRank: {
+      articleView: {
         tooltip: {
           trigger: 'axis',
           axisPointer: {
@@ -146,7 +145,10 @@ export default {
       this.userCount = result.userCount
       this.articleCount = result.articleCount
       this.commentCount = result.commentCount
-      this.articleStatisticsList = result.articleStatisticsList
+      if (result.articleStatisticsList) {
+        this.articleStatisticsList = result.articleStatisticsList
+      }
+
       if (result.articleCountResDTOList) {
         result.articleCountResDTOList.forEach(item => {
           this.category.series[0].data.push({
@@ -156,6 +158,14 @@ export default {
           this.category.legend.data.push(item.categoryName)
         })
       }
+
+      if (result.articleViewList) {
+        result.articleViewList.forEach((item) => {
+          this.articleView.series[0].data.push(item.articleView)
+          this.articleView.xAxis.data.push(item.articleTitle)
+        })
+      }
+
       this.loading = false
     }
   }
